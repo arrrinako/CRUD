@@ -1,4 +1,4 @@
-const categoriesRouter = require('express').Router();
+const usersRouter = require('express').Router();
 
 const { 
     findAllUsers,

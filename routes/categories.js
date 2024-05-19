@@ -1,5 +1,7 @@
   // Создаём роут для запросов категорий 
   const categoriesRouter = require('express').Router();
+  const { checkAuth } = require("../middlewares/auth.js");
+
   
   // Импортируем вспомогательные функции
   const {
@@ -28,6 +30,7 @@
     findAllCategories,
     checkIsCategoryExists,
     checkEmptyName,
+    checkAuth,
     createCategory,
     sendCategoryCreated
   );
@@ -36,14 +39,20 @@
 
   // Файл routes/categories.js
 
-categoriesRouter.put(
-  "/categories/:id", // Слушаем запросы по эндпоинту
-  updateCategory, // Обновляем запись в MongoDB
-  sendCategoryUpdated, // Возвращаем ответ на клиент
-  checkEmptyName
-);
+  categoriesRouter.put(
+    "/categories/:id",
+    checkEmptyName,
+    checkAuth,
+    updateCategory,
+    sendCategoryUpdated
+  );
 
-categoriesRouter.delete('/categories/:id', deleteCategory, sendCategoryDeleted);
+  categoriesRouter.delete(
+    "/categories/:id",
+    checkAuth,
+    deleteCategory,
+    sendCategoryDeleted
+  ); 
 
   
   // Экспортируем роут для использования в приложении — app.js

@@ -3,22 +3,30 @@
 // Импортируем модель
 const games = require("../models/game");
 
+// middlewares/games.js
+
 const findAllGames = async (req, res, next) => {
- console.log("GET /games");
- req.gamesArray=await games
- .find({})
- .populate("categories")
- .populate({
-  path:"users",
-  select:"-password"
- });
+  // Поиск всех игр в проекте по заданной категории
+  if(req.query["categories.name"]) { 
+    req.gamesArray = await games.findGameByCategory(req.query["categories.name"]);
+    next();
+    return;
+  }
+  // Поиск всех игр в проекте
+  req.gamesArray = await games
+    .find({})
+    .populate("categories")
+    .populate({
+      path: "users",
+      select: "-password" // Исключим данные о паролях пользователей
+    })
   next();
 };
 
+
 const createGame = async (req, res, next) => {
-  console.log("POST /games");
+  console.log("POST /api/games");
   try {
-    console.log(req.body);
     req.game = await games.create(req.body);
     next();
   } catch (error) {
@@ -27,15 +35,12 @@ const createGame = async (req, res, next) => {
 };
 
 const findGameById = async (req, res, next) => {
-  console.log("GET /games/:id");
+  console.log("GET /api/games/:id");
   try {
       req.game = await games
       .findById(req.params.id)
       .populate("categories")
-      .populate({
-        path: "users",
-        select: "-password"
-      });
+      .populate("users");
   next();
   } catch (error) {
       res.status(404).send({ message: "Game not found" });
@@ -60,11 +65,9 @@ const checkEmptyFields = async (req, res, next) => {
 };
 
 const checkIsGameExist = async(req, res, next)=>{
-  console.log(req.gamesArray);
   const isInArray=req.gamesArray.find((game)=>{
     return req.body.title===game.title;
   });
-  console.log(isInArray);
   if(isInArray){
     res.status(404).send({ message: "Игра  стаким названием не существует" });
   }else{
@@ -89,7 +92,6 @@ if (!req.body.categories || req.body.categories.length === 0) {
 // Файл middlewares/games.js
 
 const checkIfUsersAreSafe = async (req, res, next) => {
-  console.log(req.body.users);
   // Проверим, есть ли users в теле запроса
 if (!req.body.users) {
   next();
@@ -109,7 +111,7 @@ if (req.body.users.length - 1 === req.game.users.length) {
 // Файл middlewares/games.js
 
 const updateGame = async (req, res, next) => {
-  console.log("PUT /games/:id");
+  console.log("PUT /api/games/:id");
   try {
       // В метод передаём id из параметров запроса и объект с новыми свойствами
     req.game = await games.findByIdAndUpdate(req.params.id, req.body);
@@ -122,7 +124,7 @@ const updateGame = async (req, res, next) => {
 // Файл middlewares/games.js
 
 const deleteGame = async (req, res, next) => {
-  console.log("DELETE /games/:id");
+  console.log("DELETE /api/games/:id");
   try {
     // Методом findByIdAndDelete по id находим и удаляем документ из базы данных
     req.game = await games.findByIdAndDelete(req.params.id);
@@ -131,6 +133,15 @@ const deleteGame = async (req, res, next) => {
         res.status(400).send({ message: "Ошибка удаления игры" });
   }
 };
+
+const checkIsVoteRequest= async(req, res,next) =>{
+  if(Object.keys(req.body).length===1 && req.body.users){
+    req.isVoteRequest=true;
+  }
+  next();
+};
+
+
 
 
 
@@ -146,5 +157,6 @@ module.exports ={
   checkIfCategoriesAvaliable,
   checkIfUsersAreSafe,
   updateGame,
-  deleteGame
+  deleteGame,
+  checkIsVoteRequest,
 } ;

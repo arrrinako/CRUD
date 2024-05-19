@@ -1,6 +1,7 @@
 // Файл routes/games.js
 
 const gamesRouter = require('express').Router();
+const { checkAuth } = require("../middlewares/auth.js");
 
 const {
     findAllGames,
@@ -11,7 +12,8 @@ const {
     checkIfUsersAreSafe,
     updateGame,
     deleteGame,
-    checkEmptyFields
+    checkEmptyFields,
+    checkIsVoteRequest
 } = require('../middlewares/games.js');
 
 const {
@@ -40,7 +42,8 @@ gamesRouter.post(
     checkIfCategoriesAvaliable,
     checkEmptyFields,
     createGame,
-    sendGameCreated
+    sendGameCreated,
+    checkAuth,
   );
 
   gamesRouter.get('/games/:id', findGameById, sendGameById);
@@ -49,6 +52,7 @@ gamesRouter.post(
     "/games/:id", // Слушаем запросы по эндпоинту
     // Шаг 1. Находим игру по id из запроса
       findGameById,
+      checkIsVoteRequest,
       // Шаг 2. Выполняем проверки для корректного обновления
       checkIfUsersAreSafe,
       checkIfCategoriesAvaliable,
@@ -56,13 +60,15 @@ gamesRouter.post(
       // Шаг 3. Обновляем запись с игрой
       updateGame,
       // Шаг 4. Возвращаем на клиент ответ с результатом обновления
-      sendGameUpdated
+      sendGameUpdated,
+      checkAuth,
   );
 
 
 gamesRouter.delete(
     "/games/:id", // Слушаем запросы по эндпоинту
     deleteGame,
+    checkAuth,
     sendGameDeleted // Тут будут функция удаления элементов из MongoDB и ответ клиенту
   );
 

@@ -1,4 +1,4 @@
-export const BASE_URL = 'http://arfront.nomoredomainswork.ru'
+export const BASE_URL = 'http://arback.nomoredomainswork.ru'
 
 export const endpoints = {
   games: `${BASE_URL}/games`,

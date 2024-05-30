@@ -1,75 +1,49 @@
-// Файл routes/games.js
+const gamesRouter = require("express").Router();
 
-const gamesRouter = require('express').Router();
+const {
+  findAllGames,
+  checkIsGameExists,
+  checkIfCategoriesAvaliable,
+  findGameById,
+  createGame,
+  checkIfUsersAreSafe,
+  updateGame,
+  deleteGame,
+  checkEmptyFields,
+  checkIsVoteRequest,
+} = require("../middlewares/games.js");
+const {
+  sendAllGames,
+  sendGameById,
+  sendGameCreated,
+  sendGameUpdated,
+  sendGameDeleted,
+} = require("../controllers/games.js");
 const { checkAuth } = require("../middlewares/auth.js");
 
-const {
-    findAllGames,
-    checkIsGameExist,
-    checkIfCategoriesAvaliable,
-    findGameById,
-    createGame,
-    checkIfUsersAreSafe,
-    updateGame,
-    deleteGame,
-    checkEmptyFields,
-    checkIsVoteRequest
-} = require('../middlewares/games.js');
-
-const {
-    sendAllGames,
-    sendGameById,
-    sendGameCreated,
-    sendGameUpdated,
-    sendGameDeleted
-} = require('../controllers/games.js');
-
-
-
-
-gamesRouter.get('/games', findAllGames, sendAllGames);
-// gamesRouter.post("/games", findAllGames, createGame, sendGameCreated);
-
-
-// Файл routes/games.js
-
-
-
+gamesRouter.get("/games", findAllGames, sendAllGames);
 gamesRouter.post(
-    "/games",
-    findAllGames,
-    checkIsGameExist,
-    checkIfCategoriesAvaliable,
-    checkEmptyFields,
-    createGame,
-    sendGameCreated,
-    checkAuth,
-  );
+  "/games",
+  findAllGames,
+  checkIsGameExists,
+  checkIfCategoriesAvaliable,
+  checkEmptyFields,
+  checkAuth,
+  createGame,
+  sendGameCreated
+);
+gamesRouter.get("/games/:id", findGameById, sendGameById);
+gamesRouter.put(
+  "/games/:id",
+  findGameById,
+  checkIsVoteRequest,
+  checkIfUsersAreSafe,
+  checkIfCategoriesAvaliable,
+  checkEmptyFields,
+  checkAuth,
+  updateGame,
+  sendGameUpdated
+);
+gamesRouter.delete("/games/:id", deleteGame, checkAuth, sendGameDeleted);
 
-  gamesRouter.get('/games/:id', findGameById, sendGameById);
-
-  gamesRouter.put(
-    "/games/:id", // Слушаем запросы по эндпоинту
-    // Шаг 1. Находим игру по id из запроса
-      findGameById,
-      checkIsVoteRequest,
-      // Шаг 2. Выполняем проверки для корректного обновления
-      checkIfUsersAreSafe,
-      checkIfCategoriesAvaliable,
-    checkEmptyFields,
-      // Шаг 3. Обновляем запись с игрой
-      updateGame,
-      // Шаг 4. Возвращаем на клиент ответ с результатом обновления
-      sendGameUpdated,
-      checkAuth,
-  );
-
-
-gamesRouter.delete(
-    "/games/:id", // Слушаем запросы по эндпоинту
-    deleteGame,
-    checkAuth,
-    sendGameDeleted // Тут будут функция удаления элементов из MongoDB и ответ клиенту
-  );
-
-  module.exports = gamesRouter;
+module.exports = gamesRouter;

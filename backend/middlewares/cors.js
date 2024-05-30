@@ -1,6 +1,6 @@
 // Вместо нашего адреса вставь свой
 // Можно ещё не удалять адреса с localhost, но мы удалили для краткости
-const allowedCors = ["https://arfront.nomoredomainswork.ru"];
+const allowedCors = ["http://localhost:3001", "http://localhost:3000", "https://arfront.nomoredomainswork.ru"];
 
 function cors(req, res, next) {
   const { origin } = req.headers;

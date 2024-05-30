@@ -31,6 +31,7 @@ if (Object.keys(req.body).length === 1 && req.body.users) {
 next();
 };
 
+
 const checkEmptyFields = async (req, res, next) => {
   if(req.isVoteRequest){
     next();
